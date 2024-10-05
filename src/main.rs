@@ -1,14 +1,15 @@
-use libwayshot::WayshotConnection;
+use flameshot::ScreenArgs;
 use raylib::{ffi::Image as FfiImage, prelude::*};
 const SPOTLIGHT_TINT: Color = Color::new(0x00, 0x00, 0x00, 190);
 
 fn main() {
-    let wayshot_connection =
-        WayshotConnection::new().expect("failed to connect to the wayland display server");
-    let screenshot_image = wayshot_connection
-        .screenshot_all(false)
-        .expect("failed to take a screenshot")
-        .to_rgba8();
+    let raw =
+        flameshot::execute(ScreenArgs::builder().raw().build()).expect("Failed to take screenshot");
+    let dyna_img = raw
+        .to_dynamic_image()
+        .expect("Failed to convert dynamic image");
+    let screenshot_image = dyna_img.to_rgba8();
+
     let (width, height) = screenshot_image.dimensions();
     let (mut rl, thread) = raylib::init()
         .title(env!("CARGO_BIN_NAME"))
@@ -18,11 +19,6 @@ fn main() {
         .vsync()
         .build();
 
-    // let monitor_id = unsafe { raylib::ffi::GetCurrentMonitor() };
-    // let monitor_position = unsafe { raylib::ffi::GetMonitorPosition(monitor_id) };
-    // dbg!(monitor_position);
-    // let monitor_width = unsafe { raylib::ffi::GetMonitorWidth(monitor_id) };
-    // let monitor_height = unsafe { raylib::ffi::GetMonitorHeight(monitor_id) };
     let screenshot_image = unsafe {
         Image::from_raw(FfiImage {
             // We can leak memory here because raylib will free the memory for us
@@ -74,9 +70,15 @@ fn main() {
     spotlight_radius_multiplier_uniform_location =
         spotlight_shader.get_shader_location("spotlightRadiusMultiplier");
     while !rl.window_should_close() {
-        if rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_RIGHT) {
+        let key_pressed = rl.get_key_pressed();
+        if key_pressed != Some(KeyboardKey::KEY_LEFT_CONTROL)
+            && key_pressed != Some(KeyboardKey::KEY_LEFT_SHIFT)
+            && key_pressed != Some(KeyboardKey::KEY_R)
+            && key_pressed != None
+        {
             break;
         }
+
         #[cfg(feature = "dev")]
         if rl.is_key_pressed(KeyboardKey::KEY_R) {
             spotlight_shader = rl
@@ -89,9 +91,9 @@ fn main() {
                 spotlight_shader.get_shader_location("spotlightRadiusMultiplier");
         }
         let enable_spotlight = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL);
-        let scrolled_amount = rl.get_mouse_wheel_move_v().y;
+        let scrolled_amount = rl.get_mouse_wheel_move_v().y * 1.3;
         if rl.is_key_pressed(KeyboardKey::KEY_LEFT_CONTROL) {
-            spotlight_radius_multiplier = 5.0;
+            spotlight_radius_multiplier = 15.0;
             spotlight_radius_multiplier_delta = -15.0;
         }
         if scrolled_amount != 0.0 {
@@ -100,10 +102,10 @@ fn main() {
                 rl.is_key_down(KeyboardKey::KEY_LEFT_SHIFT),
             ) {
                 (_, false) => {
-                    delta_scale += scrolled_amount as f64;
+                    delta_scale += (scrolled_amount * 1.3) as f64;
                 }
                 (true, true) => {
-                    spotlight_radius_multiplier_delta -= scrolled_amount as f64;
+                    spotlight_radius_multiplier_delta -= (scrolled_amount * -1.3) as f64;
                 }
                 _ => {}
             }
