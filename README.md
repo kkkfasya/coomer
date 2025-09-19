@@ -9,12 +9,14 @@
 
 ## Installation:
 #### Dependencies:
-- wayland-client
-- cmake
 - rust
-- pkg-config
-- raylib & raylib-devel
 - clang (for compiling raylib)
+- cmake
 - libclang (for bindgen)
+- raylib & raylib-devel
+- libglfw3
+- libwayland-client
+- pkg-config
 
-then just do ```cargo build --release```, your compiled binary will be in target/release
+then just do ```cargo build --release```, your compiled binary will be in target/release  
+or download pre-compiled binary from release (only tested on Fedora linux)
