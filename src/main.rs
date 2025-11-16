@@ -36,28 +36,18 @@
 .......................,?+......,::.:+++***?%?%**??**:;;,.....,**.........................
 ......................:?;.....,+:,,.......,,::+,,;:...;,........*+........................*/
 
-/* (*Wakes up) The birds are singing, the flowers are blooming, my dick is throbbing, 
- * what a beautiful day for cooming. Good morning Alix Lynx, I've been awake for 20 whole seconds 
- * and I haven't coomed yet. It's time to hope on my porn throne and machine gun jackhammer 
- * my bloodshot death-grip bloodshot semi chub with my roided doomfist once again! 
- * (Types on keyboard). I-s...is that a Female Girl?? HMMGH, I-I MUST SNIFF, SNNNNNNNNIIIIIIIIIIIIFFFFFFFF** 
- * OH GOD (FAPFAPFAPFAP) FUCCKK, HUHGHU, SNIIFF, HUHGJGUHHGUGHU (SMASHES DESK) I-I-IM COOOMING!!!!! IM COOMING, 
- * IM COOMING IM COOOMING IM COOOOOMING COOOOOOOOOOM, COOOMING, FUCCKKK, AHHAFHHAHUHG,
- * COOOOOM, AW FUCK ITS EVERYWHERE, COOOOOM, AWGAHUGHAHG. Aw fuck, aw fuck. oh jesus. 
- * ahhghhha, there you are, my slippery white goo to the world, my son, my son...Well, 
- * it's time to get breakfast...well a little coom first wouldn't hurt. */
-
-use flameshot::ScreenArgs;
+use libwayshot::WayshotConnection;
 use raylib::{ffi::Image as FfiImage, prelude::*};
 const SPOTLIGHT_TINT: Color = Color::new(0x00, 0x00, 0x00, 190);
 
 fn main() {
-    let raw =
-        flameshot::execute(ScreenArgs::builder().raw().build()).expect("Failed to take screenshot");
-    let dyna_img = raw
-        .to_dynamic_image()
-        .expect("Failed to convert dynamic image");
-    let screenshot_image = dyna_img.to_rgba8();
+    let wayshot_connection =
+        WayshotConnection::new().expect("failed to connect to the wayland display server");
+
+    let screenshot_image = wayshot_connection
+        .screenshot_all(false)
+        .expect("failed to take a screenshot")
+        .to_rgba8();
 
     let (width, height) = screenshot_image.dimensions();
     let (mut rl, thread) = raylib::init()
@@ -81,6 +71,7 @@ fn main() {
             height: height as i32,
         })
     };
+
     let screenshot_texture = rl
         .load_texture_from_image(&thread, &screenshot_image)
         .expect("failed to load screenshot into a texture");
