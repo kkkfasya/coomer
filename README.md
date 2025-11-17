@@ -17,6 +17,7 @@
 - libglfw3
 - libwayland-client
 - pkg-config
+- mesa-libgbm (for this implementation only, also idk abt other gpu)
 
 then just do ```cargo build --release```, your compiled binary will be in target/release  
 or download pre-compiled binary from release (only tested on Fedora linux)
