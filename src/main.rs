@@ -36,7 +36,7 @@
 .......................,?+......,::.:+++***?%?%**??**:;;,.....,**.........................
 ......................:?;.....,+:,,.......,,::+,,;:...;,........*+........................*/
 
-use libwayshot::WayshotConnection;
+use libwayshot_freeze_feat_andrean::WayshotConnection;
 use raylib::{ffi::Image as FfiImage, prelude::*};
 const SPOTLIGHT_TINT: Color = Color::new(0x00, 0x00, 0x00, 190);
 
